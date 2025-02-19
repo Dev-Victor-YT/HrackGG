@@ -1,27 +1,17 @@
--- Caminho para a pasta que contém os arquivos
-local path = "/storage/emulated/0/Android/data/com.dts.freefireth/cache/"
+-- Caminho para a pasta de cache do Free Fire no dispositivo rootado
+local path = "/data/data/com.dts.freefireth/cache/"
 
--- Função para listar arquivos e remover um por um
-function removeFilesInFolder(folderPath)
-    -- Comando shell para listar arquivos (com root)
-    local command = "ls " .. folderPath
-    local handle = io.popen("su -c '" .. command .. "'")  -- "su" para obter root
-    local result = handle:read("*a")
-    handle:close()
+-- Comando para listar arquivos de cache com permissões de root
+local command = "ls " .. path
 
-    -- Verifica se a lista de arquivos foi obtida
-    if result ~= "" then
-        -- Dividir a lista de arquivos por linha
-        for file in result:gmatch("[^\r\n]+") do
-            local filePath = folderPath .. file
-            -- Comando para remover o arquivo (com root)
-            os.execute("su -c 'rm -f " .. filePath .. "'")  -- "su" para executar com root
-            print("Arquivo removido: " .. filePath)
-        end
-    else
-        print("Nenhum arquivo encontrado ou erro ao acessar o diretório.")
-    end
+-- Executando o comando com root usando 'su'
+local handle = io.popen("su -c '" .. command .. "'")
+local result = handle:read("*a")
+handle:close()
+
+-- Exibindo os arquivos encontrados no diretório de cache
+if result ~= "" then
+    print("Arquivos na pasta de cache do Free Fire: \n" .. result)
+else
+    print("Erro ao acessar a pasta ou não há arquivos.")
 end
-
--- Chama a função passando o caminho da pasta
-removeFilesInFolder(path)
