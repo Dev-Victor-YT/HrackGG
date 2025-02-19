@@ -141,12 +141,27 @@ end
 WALLHRACK1 = "OFF❎"
 function WALLHRACK(...)
 if WALLHRACK1 == "OFF❎"  then
+gg["toast"]('⌛ WALLHRACK ATIVANDO ⌛')
 
 -- Caminho da pasta original
 local oldPath = "/storage/emulated/0/Android/obb/com.dts.freefireth"
 
 -- Caminho para a nova pasta
 local newPath = "/storage/emulated/0/Android/obb/com.dts.freefireth2"
+
+-- Função para renomear a pasta
+os.rename(oldPath, newPath)
+
+-- Exibe mensagem confirmando a mudança
+-- print("Pasta renomeada de '" .. oldPath .. "' para '" .. newPath .. "'")
+
+gg["sleep"](2000)
+
+-- Caminho da pasta original
+local oldPath = "/storage/emulated/0/Android/obb/com.dts.freefireth2"
+
+-- Caminho para a nova pasta
+local newPath = "/storage/emulated/0/Android/obb/com.dts.freefireth"
 
 -- Função para renomear a pasta
 os.rename(oldPath, newPath)
