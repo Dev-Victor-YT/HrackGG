@@ -1,17 +1,11 @@
--- Caminho para a pasta de cache do Free Fire no dispositivo rootado
-local path = "/data/data/com.dts.freefireth/cache/"
+-- Caminho da pasta original
+local oldPath = "/storage/emulated/0/Android/data/com.dts.freefireth/cache/1"
 
--- Comando para listar arquivos de cache com permissões de root
-local command = "ls " .. path
+-- Caminho para a nova pasta
+local newPath = "/storage/emulated/0/Android/data/com.dts.freefireth/cache/2"
 
--- Executando o comando com root usando 'su'
-local handle = io.popen("su -c '" .. command .. "'")
-local result = handle:read("*a")
-handle:close()
+-- Função para renomear a pasta
+os.rename(oldPath, newPath)
 
--- Exibindo os arquivos encontrados no diretório de cache
-if result ~= "" then
-    print("Arquivos na pasta de cache do Free Fire: \n" .. result)
-else
-    print("Erro ao acessar a pasta ou não há arquivos.")
-end
+-- Exibe mensagem confirmando a mudança
+print("Pasta renomeada de '" .. oldPath .. "' para '" .. newPath .. "'")
