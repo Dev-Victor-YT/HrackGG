@@ -22,7 +22,6 @@ function HrackGG_OFICIAL()
 -- gg.multiChoice
 HrackGG = gg["choice"]({
 WALLHRACK1 .." ⛰️ WALLHRACK VIP⛰️",
-ANTENA_CABECA1  .."👦ANTENA CABEÇA VIP👦",
 ANT_REPORT1 .."🔒ANT REPORT VIP🔒",
 BYPASS_ANTIBAN1 .." ⏳BYPASS ANTIBAN VIP⏳",
 TIRA_TRAVAMENTO1 .."📱TIRA TRAVAMENTO 100% VIP📱",
@@ -43,24 +42,21 @@ if HrackGG == 1 then
 WALLHRACK()
 end
 if HrackGG == 2 then
-ANTENA1()
-end
-if HrackGG == 3 then
 ANTI_REPOR()
 end
-if HrackGG == 4 then
+if HrackGG == 3 then
 BYPASS()
 end
-if HrackGG == 5 then
+if HrackGG == 4 then
 TIRA_TRAVAMENTO()
 end
-if HrackGG == 6 then
+if HrackGG == 5 then
 APAGAR_CACHER()
 end
-if HrackGG == 7 then
+if HrackGG == 6 then
 APAGAR_CONTA()
 end
-if HrackGG == 8 then
+if HrackGG == 7 then
 SAIR = gg["alert"]("╔══════  ࿇  ══════╗\n\a\aQUER SAIR DA SCRIPT?\n╚══════  ࿇  ══════╝", "[SIM]", "[NÃO]")
 if SAIR == 1 then
 gg.copyText("https://bit.ly/3CNjEWB")
@@ -118,35 +114,6 @@ end
 end
 
 
-
-
-
-ANTENA_CABECA1  = "OFF❎"
-function ANTENA1(...)
-if ANTENA_CABECA1  == "OFF❎"  then
-gg["setRanges"](gg.REGION_ANONYMOUS)
-gg["searchNumber"]("5.9762459e-7;1::5", gg.TYPE_FLOAT)
-gg["getResults"](1000)
-gg.editAll("5.9762459e-7;250.1", gg.TYPE_FLOAT)
-gg["clearResults"]()
-gg["searchNumber"]("7.5538861e-7;1::5", gg.TYPE_FLOAT)
-gg["getResults"](1000)
-gg.editAll("7.5538861e-7;250.1", gg.TYPE_FLOAT)
-gg["clearResults"]()
-gg["toast"]('🔒ANTENA ATIVADO🔒')
-ANTENA_CABECA1  = "ON☑️"
-elseif ANTENA_CABECA1  == "ON☑️"  then
-gg["setRanges"](gg.REGION_ANONYMOUS)
-gg["searchNumber"]("250.1", gg.TYPE_FLOAT)
-gg["getResults"](1000)
-gg.editAll("1", gg.TYPE_FLOAT)
-gg["clearResults"]()
-gg["toast"]('🔓ANTENA DESATIVADO🔓')
-ANTENA_CABECA1  = "OFF❎"
-end
-end
- 
- 
  
  
  
