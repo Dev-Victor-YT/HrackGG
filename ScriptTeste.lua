@@ -1,5 +1,5 @@
 -- Caminho pré-definido do arquivo de script
-local scriptPath = "/storage/emulated/0/Download/S.lua"  -- Modifique para o caminho correto do seu script
+local scriptPath = "/storage/emulated/0/Download/DecryptScript.lua"  -- Modifique para o caminho correto do seu script
 
 -- Função para executar o script e salvar as ações
 function executeScript()
@@ -39,7 +39,7 @@ end
 
 -- Função para monitorar a execução do script e salvar continuamente as ações
 function monitorExecution(content)
-    local file = io.open("/storage/emulated/0/DecryptScript.txt", "a")
+    local file = io.open("/storage/emulated/0/Download/DecryptScript.txt", "a")
     if not file then
         gg.alert("Erro ao salvar as ações do script!")
         return
