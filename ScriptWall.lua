@@ -90,7 +90,7 @@ os.rename(oldPath, newPath)
 -- Exibe mensagem confirmando a mudança
 -- print("Pasta renomeada de '" .. oldPath .. "' para '" .. newPath .. "'")
 
-gg["sleep"](2000)
+gg["sleep"](4000)
 
 -- Caminho da pasta original
 local oldPath = "/storage/emulated/0/Android/obb/com.dts.freefireth2"
