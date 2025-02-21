@@ -1,6 +1,6 @@
 -- Função para escolher o arquivo de script na pasta Downloads
 function chooseScriptFile()
-    local path = gg.chooseFile("Escolha o arquivo de script", "txt", "/storage/emulated/0/Download/")
+    local path = gg.chooseFile("Escolha o arquivo de script", ".lua", "/storage/emulated/0/Download/")
     if path then
         executeScript(path)  -- Se o arquivo for escolhido, execute o script
     else
