@@ -21,8 +21,6 @@ gg.toast("■■■■■■■100%")
 function HrackGG_OFICIAL()
 -- gg.multiChoice
 HrackGG = gg["choice"]({
-GHOT1 .." 👻FANTASMA VIP👻",
-ZE_PEDRINHA1 .." ⛰️ ZE PEDRINHA VIP⛰️",
 WALLHRACK1 .." ⛰️ WALLHRACK VIP⛰️",
 ANTENA_CABECA1  .."👦ANTENA CABEÇA VIP👦",
 ANT_REPORT1 .."🔒ANT REPORT VIP🔒",
@@ -42,33 +40,27 @@ end
 -- C100()
 -- end
 if HrackGG == 1 then
-GHOST()
-end
-if HrackGG == 2 then
-PEDRINHA()
-end
-if HrackGG == 3 then
 WALLHRACK()
 end
-if HrackGG == 4 then
+if HrackGG == 2 then
 ANTENA1()
 end
-if HrackGG == 5 then
+if HrackGG == 3 then
 ANTI_REPOR()
 end
-if HrackGG == 6 then
+if HrackGG == 4 then
 BYPASS()
 end
-if HrackGG == 7 then
+if HrackGG == 5 then
 TIRA_TRAVAMENTO()
 end
-if HrackGG == 8 then
+if HrackGG == 6 then
 APAGAR_CACHER()
 end
-if HrackGG == 9 then
+if HrackGG == 7 then
 APAGAR_CONTA()
 end
-if HrackGG == 10 then
+if HrackGG == 8 then
 SAIR = gg["alert"]("╔══════  ࿇  ══════╗\n\a\aQUER SAIR DA SCRIPT?\n╚══════  ࿇  ══════╝", "[SIM]", "[NÃO]")
 if SAIR == 1 then
 gg.copyText("https://bit.ly/3CNjEWB")
@@ -81,59 +73,6 @@ end
 HrackGG2 = -1
 end
 
-
-
-
-
-GHOT1 = "OFF❎"
-function GHOST(...)
-if GHOT1 == "OFF❎"  then
-HrackGG10("0xE0A34C", "0000A0E31EFF2FE1")
-gg.clearResults()
-gg["toast"]('🔒GHOST ATIVADO🔒')
-GHOT1 = "ON☑️"
-elseif GHOT1 == "ON☑️"  then
-HrackGG10("0xE0A34C", "F04F2DE91CB08DE2")
-gg.clearResults()
-gg["toast"]('🔓GHOST DESATIVADO🔓 ')
-GHOT1 = "OFF❎"
-end
-end
-
-
-
-
-
-ZE_PEDRINHA1 = "OFF❎"
-function PEDRINHA(...)
-if ZE_PEDRINHA1 == "OFF❎"  then
-gg["clearResults"]()
-io["output"](fileData):write([[
-13965
-Var #C5671E68|c5671e68|10|3f800000|0|0|0|0|r-xp|/data/app/com.dts.freefireth-MVBrBLlAtt2JKNz2itAl5Q==/lib/arm/libunity.so|ad7e68
-]]):close()
-gg["loadList"](fileData, gg.LOAD_APPEND | gg.LOAD_VALUES)
-os["remove"](fileData)
-gg["sleep"](50)
-gg["clearList"]()
-gg["clearResults"]()
-gg["toast"]('🔒ZE PEDRINHA ATIVADO 🔒')
-ZE_PEDRINHA1 = "ON☑️"
-elseif ZE_PEDRINHA1 == "ON☑️"  then
-gg["clearResults"]()
-io["output"](fileData):write([[
-13965
-Var #C5671E68|c5671e68|10|cafffe57|0|0|0|0|r-xp|/data/app/com.dts.freefireth-MVBrBLlAtt2JKNz2itAl5Q==/lib/arm/libunity.so|ad7e68
-]]):close()
-gg["loadList"](fileData, gg.LOAD_APPEND | gg.LOAD_VALUES)
-os["remove"](fileData)
-gg["sleep"](50)
-gg["clearList"]()
-gg["clearResults"]()
-gg["toast"]('🔓ZE PEDRINHA DESATIVADO🔓')
-ZE_PEDRINHA1 = "OFF❎"
-end
-end
 
 
 
@@ -155,7 +94,7 @@ os.rename(oldPath, newPath)
 -- Exibe mensagem confirmando a mudança
 -- print("Pasta renomeada de '" .. oldPath .. "' para '" .. newPath .. "'")
 
-gg["sleep"](7500)
+gg["sleep"](2000)
 
 -- Caminho da pasta original
 local oldPath = "/storage/emulated/0/Android/obb/com.dts.freefireth2"
