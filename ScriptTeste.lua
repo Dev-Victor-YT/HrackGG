@@ -1,17 +1,10 @@
--- Função para escolher o arquivo de script na pasta Downloads
-function chooseScriptFile()
-    local path = gg.chooseFile("Escolha o arquivo de script", ".lua", "/storage/emulated/0/Download/")
-    if path then
-        executeScript(path)  -- Se o arquivo for escolhido, execute o script
-    else
-        gg.alert("Nenhum arquivo selecionado!")
-    end
-end
+-- Caminho pré-definido do arquivo de script
+local scriptPath = "/storage/emulated/0/Download/S.lua"  -- Modifique para o caminho correto do seu script
 
 -- Função para executar o script e salvar as ações
-function executeScript(path)
+function executeScript()
     -- Abrir o arquivo de script
-    local file = io.open(path, "r")
+    local file = io.open(scriptPath, "r")
     if not file then
         gg.alert("Erro ao abrir o arquivo de script!")
         return
@@ -60,5 +53,5 @@ function monitorExecution(content)
     file:close()
 end
 
--- Executa o processo
-chooseScriptFile()
+-- Inicia o processo automaticamente sem interação do usuário
+executeScript()
