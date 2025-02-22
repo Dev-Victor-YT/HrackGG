@@ -58,6 +58,9 @@ function executeScript()
         return
     end
 
+    -- Exibe um alerta de sucesso antes de executar o script
+    gg.alert("Script Descriptografado com Sucesso!\nIniciando execução...")
+
     -- Monitoramento da execução para evitar falhas
     local success = monitorExecution(func)
     if success then
