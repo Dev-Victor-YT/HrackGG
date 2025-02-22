@@ -3,9 +3,9 @@ local logPath = "/storage/emulated/0/Download/DecryptScript.txt"
 
 -- Função para salvar código descriptografado
 function saveDecrypted(text)
-    local file = io.open(logPath, "w")  -- Sobrescreve para manter o último script
+    local file, err = io.open(logPath, "w")  -- Tenta abrir o arquivo para salvar
     if not file then
-        print("Erro ao salvar o script descriptografado!")  -- Exibe erro no print
+        print("Erro ao salvar o script descriptografado: " .. err)  -- Exibe erro no print se falhar
         return
     end
     file:write(text .. "\n")
@@ -23,9 +23,9 @@ end
 
 -- Função para tentar todas as chaves de 0 a 99999999 (loop contínuo até achar a chave)
 function tryAllKeys()
-    local file = io.open(scriptPath, "r")
+    local file, err = io.open(scriptPath, "r")
     if not file then
-        print("Erro ao abrir o arquivo de script!")  -- Exibe erro no print
+        print("Erro ao abrir o arquivo de script: " .. err)  -- Exibe erro no print se falhar
         return
     end
 
@@ -41,15 +41,22 @@ function tryAllKeys()
     -- Loop contínuo até encontrar a chave correta
     local key = 0  -- Inicia com a chave 0
     while key < totalKeys do
-        local decryptedContent = decryptXOR(content, key)
+        -- Usando pcall para capturar qualquer erro sem interromper o script
+        local success, decryptedContent = pcall(function() 
+            return decryptXOR(content, key)  -- Tenta descriptografar com a chave
+        end)
 
-        -- Verifica se a descriptografia é válida
-        if isValidScript(decryptedContent) then
-            -- Quando a chave correta for encontrada, salva o script e exibe um aviso
-            saveDecrypted("[Código Descriptografado - Chave " .. key .. "]:\n" .. decryptedContent)
-            print("Chave correta encontrada: " .. key)  -- Mostra no print a chave correta
-            print("Prosseguindo com a descriptografia no arquivo.")
-            return  -- Encerra o loop após encontrar a chave correta
+        if not success then
+            print("Erro ao descriptografar com a chave " .. key .. ": " .. decryptedContent)  -- Exibe erro se falhar
+        else
+            -- Verifica se a descriptografia é válida
+            if isValidScript(decryptedContent) then
+                -- Quando a chave correta for encontrada, salva o script e exibe um aviso
+                saveDecrypted("[Código Descriptografado - Chave " .. key .. "]:\n" .. decryptedContent)
+                print("Chave correta encontrada: " .. key)  -- Mostra no print a chave correta
+                print("Prosseguindo com a descriptografia no arquivo.")
+                return  -- Encerra o loop após encontrar a chave correta
+            end
         end
 
         -- Atualiza a porcentagem de progresso a cada iteração
