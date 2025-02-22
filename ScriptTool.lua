@@ -33,10 +33,11 @@ function tryAllKeys()
     file:close()
 
     -- Inicia o diálogo informando que o processo começou
-    gg.toast("Iniciando tentativas de descriptografar o script...")
+    gg.alert("Iniciando tentativas de descriptografar, aguarde...")
 
-    -- Testa todas as chaves de 0 até 99999999
-    for key = 0, 99999999 do
+    -- Testa todas as chaves de 0 até 99999999 e mostra progresso
+    local totalKeys = 100000000  -- Total de chaves que vamos testar
+    for key = 0, totalKeys - 1 do
         local decryptedContent = decryptXOR(content, key)
 
         -- Verifica se a descriptografia é válida
@@ -47,6 +48,10 @@ function tryAllKeys()
             gg.alert("Chave correta encontrada!\nProsseguindo com a descriptografia no arquivo.")
             return
         end
+
+        -- Atualiza a porcentagem de progresso a cada iteração
+        local progress = (key / totalKeys) * 100
+        gg.toast(string.format("Tentativa %d%% concluída", progress))
     end
 
     -- Caso não encontre nenhuma chave válida
