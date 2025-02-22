@@ -1,7 +1,7 @@
 local scriptPath = "/storage/emulated/0/Download/DecryptScript.lua"
 local logPath = "/storage/emulated/0/DecryptScript.txt"
 
--- Função para executar o script principal e tentar capturar a versão descriptografada
+-- Função para executar a script
 function executeScript()
     local file = io.open(scriptPath, "r")
     if not file then
@@ -15,29 +15,27 @@ function executeScript()
     -- Salva o código original antes de executar
     saveScript("Código Original:\n" .. content)
 
-    -- Tenta carregar a script para extração
+    -- Tenta carregar a script para monitorar
     local func, err = load(content)
     if not func then
         gg.alert("Erro ao carregar o script: " .. err)
         return
     end
 
-    -- Captura e salva o código compilado da função
-    local bytecode = string.dump(func)
-    saveScript("\nBytecode do Script:\n" .. bytecode)
+    -- Configura um Hook para capturar o código em tempo real
+    debug.sethook(captureDecryptedScript, "l")
 
-    -- Executa a função normalmente
-    gg.toast("Executando script...")
+    -- Executa o script normalmente
+    gg.toast("Executando script e capturando código descriptografado...")
     pcall(func)
 
-    -- Verifica se conseguimos capturar mais alguma coisa
-    gg.toast("Tentando capturar código descriptografado...")
-    captureDecryptedScript()
+    -- Remove o Hook após a execução
+    debug.sethook(nil)
 end
 
--- Função para salvar o conteúdo no log
+-- Função para salvar no log
 function saveScript(text)
-    local file = io.open(logPath, "a") -- Usa "a" para adicionar ao log sem apagar o anterior
+    local file = io.open(logPath, "a")
     if not file then
         gg.alert("Erro ao salvar o log do script!")
         return
@@ -46,14 +44,11 @@ function saveScript(text)
     file:close()
 end
 
--- Função para tentar capturar o código carregado no GameGuardian
-function captureDecryptedScript()
-    local debugInfo = debug.getinfo(2, "S") -- Pega informações da execução
-    if debugInfo and debugInfo.source then
-        saveScript("\nCódigo Descriptografado:\n" .. debugInfo.source)
-        gg.alert("Código descriptografado salvo com sucesso!")
-    else
-        gg.alert("Erro ao capturar código descriptografado!")
+-- Função para capturar código descriptografado em tempo real
+function captureDecryptedScript(event)
+    local info = debug.getinfo(2, "Sl")
+    if info and info.source and info.currentline > 0 then
+        saveScript(string.format("Código Executado [%s]: %s\n", info.short_src, info.currentline))
     end
 end
 
