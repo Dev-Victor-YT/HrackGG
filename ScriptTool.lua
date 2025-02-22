@@ -1,54 +1,70 @@
--- Importa classes Java necessárias
-local AlertDialog = luajava.bindClass("android.app.AlertDialog")
-local EditText = luajava.bindClass("android.widget.EditText")
-local LinearLayout = luajava.bindClass("android.widget.LinearLayout")
-local Context = luajava.bindClass("android.content.Context")
-local DialogInterface = luajava.bindClass("android.content.DialogInterface")
-local Toast = luajava.bindClass("android.widget.Toast")
+-- Solicita o nome do pacote ao usuário
+local packageName = gg.prompt({"Digite o nome do pacote do jogo/aplicativo:"}, {""}, {"text"})
 
--- Obtém o contexto do GG
-local ggContext = gg.getTargetInfo().context
+-- Se o usuário não digitou nada, aborta
+if not packageName or packageName[1] == "" then
+    gg.alert("Erro: Nenhum nome de pacote inserido!")
+    os.exit()
+end
 
--- Cria um campo de entrada para o "código Java"
-local input = luajava.new(EditText, ggContext)
-input:setHint("Digite um comando Java (ex: AlertDialog)")
+-- Tenta encontrar o processo do pacote
+local processFound = false
+local processes = gg.getTargets()
 
--- Cria um layout para o diálogo
-local layout = luajava.new(LinearLayout, ggContext)
-layout:setOrientation(1)
-layout:addView(input)
-
--- Função que simula a execução de código Java no GG
-function executarSimulacao(codigo)
-    if codigo:find("AlertDialog") then
-        local builder = luajava.new(AlertDialog.Builder, ggContext)
-        builder:setTitle("Simulação de Java")
-        builder:setMessage("Este é um AlertDialog criado a partir do seu código.")
-        builder:setPositiveButton("OK", nil)
-        builder:create():show()
-    elseif codigo:find("Toast") then
-        Toast.makeText(ggContext, "Simulação de Toast!", Toast.LENGTH_LONG):show()
-    else
-        Toast.makeText(ggContext, "Código não reconhecido!", Toast.LENGTH_LONG):show()
+for _, process in ipairs(processes) do
+    if process.pkgName == packageName[1] then
+        gg.setTargetPackage(packageName[1])
+        processFound = true
+        break
     end
 end
 
--- Cria o diálogo de entrada
-local builder = luajava.new(AlertDialog.Builder, ggContext)
-builder:setTitle("Executar Código Java")
-builder:setView(layout)
+if not processFound then
+    gg.alert("Erro: Pacote não encontrado! Abra o jogo/app primeiro.")
+    os.exit()
+end
 
--- Botão "Executar"
-builder:setPositiveButton("Executar", luajava.createProxy(DialogInterface.OnClickListener, {
-    onClick = function(dialog, which)
-        local codigo = input:getText():toString()
-        executarSimulacao(codigo)
-    end
-}))
+-- Solicita o valor a ser pesquisado
+local values = gg.prompt({"Digite o valor a ser pesquisado:"}, {""}, {"number"})
 
--- Botão "Cancelar"
-builder:setNegativeButton("Cancelar", nil)
+if not values or values[1] == "" then
+    gg.alert("Erro: Nenhum valor inserido!")
+    os.exit()
+end
 
--- Exibe o diálogo
-local dialog = builder:create()
-dialog:show()
+local searchValue = tonumber(values[1])
+if not searchValue then
+    gg.alert("Erro: Valor inválido!")
+    os.exit()
+end
+
+-- Pesquisa o valor na memória
+gg.searchNumber(searchValue, gg.TYPE_DWORD)
+
+-- Verifica se encontrou resultados
+local results = gg.getResults(1)
+
+if #results == 0 then
+    gg.alert("Erro: Nenhum valor encontrado!")
+    os.exit()
+end
+
+-- Solicita o novo valor a ser inserido
+local newValueInput = gg.prompt({"Digite o novo valor:"}, {""}, {"number"})
+
+if not newValueInput or newValueInput[1] == "" then
+    gg.alert("Erro: Nenhum novo valor inserido!")
+    os.exit()
+end
+
+local newValue = tonumber(newValueInput[1])
+if not newValue then
+    gg.alert("Erro: Novo valor inválido!")
+    os.exit()
+end
+
+-- Modifica o valor na memória
+results[1].value = newValue
+gg.setValues(results)
+
+gg.alert("Valor modificado com sucesso!\nDe: " .. searchValue .. "\nPara: " .. newValue)
