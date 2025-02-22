@@ -7,39 +7,44 @@ if not packageName or packageName[1] == "" then
     os.exit()
 end
 
--- Tenta encontrar o processo do pacote
-local processFound = false
+local packageNameInput = packageName[1]
+
+-- Obtém a lista de processos ativos
 local processes = gg.getTargets()
+local processFound = false
 
 for _, process in ipairs(processes) do
-    if process.pkgName == packageName[1] then
-        gg.setTargetPackage(packageName[1])
+    if process.pkgName == packageNameInput then
         processFound = true
+        gg.setTargetPackage(packageNameInput) -- Define o alvo para esse pacote
         break
     end
 end
 
+-- Se o pacote não foi encontrado, exibe erro e sai
 if not processFound then
-    gg.alert("Erro: Pacote não encontrado! Abra o jogo/app primeiro.")
+    gg.alert("Erro: O pacote '" .. packageNameInput .. "' não está sendo executado!\nAbra o app/jogo primeiro e tente novamente.")
     os.exit()
 end
 
--- Solicita o valor a ser pesquisado
-local values = gg.prompt({"Digite o valor a ser pesquisado:"}, {""}, {"number"})
+gg.alert("Pacote '" .. packageNameInput .. "' encontrado e selecionado com sucesso!")
 
-if not values or values[1] == "" then
+-- Solicita o valor a ser pesquisado
+local searchValue = gg.prompt({"Digite o valor a ser pesquisado:"}, {""}, {"number"})
+
+if not searchValue or searchValue[1] == "" then
     gg.alert("Erro: Nenhum valor inserido!")
     os.exit()
 end
 
-local searchValue = tonumber(values[1])
-if not searchValue then
+local searchNumber = tonumber(searchValue[1])
+if not searchNumber then
     gg.alert("Erro: Valor inválido!")
     os.exit()
 end
 
 -- Pesquisa o valor na memória
-gg.searchNumber(searchValue, gg.TYPE_DWORD)
+gg.searchNumber(searchNumber, gg.TYPE_DWORD)
 
 -- Verifica se encontrou resultados
 local results = gg.getResults(1)
@@ -67,4 +72,4 @@ end
 results[1].value = newValue
 gg.setValues(results)
 
-gg.alert("Valor modificado com sucesso!\nDe: " .. searchValue .. "\nPara: " .. newValue)
+gg.alert("Valor modificado com sucesso!\nDe: " .. searchNumber .. "\nPara: " .. newValue)
