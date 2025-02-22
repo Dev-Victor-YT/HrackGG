@@ -9,21 +9,17 @@ end
 
 local packageNameInput = packageName[1]
 
--- Obtém a lista de processos ativos
-local processes = gg.getTargets()
+-- Obtém o processo ativo do pacote informado
 local processFound = false
+local processID = gg.getTargetInfo().packageName
 
-for _, process in ipairs(processes) do
-    if process.pkgName == packageNameInput then
-        processFound = true
-        gg.setTargetPackage(packageNameInput) -- Define o alvo para esse pacote
-        break
-    end
+if processID == packageNameInput then
+    processFound = true
 end
 
 -- Se o pacote não foi encontrado, exibe erro e sai
 if not processFound then
-    gg.alert("Erro: O pacote '" .. packageNameInput .. "' não está sendo executado!\nAbra o app/jogo primeiro e tente novamente.")
+    gg.alert("Erro: O pacote '" .. packageNameInput .. "' não está rodando!\nAbra o jogo/app primeiro e tente novamente.")
     os.exit()
 end
 
