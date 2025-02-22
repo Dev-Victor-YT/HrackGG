@@ -5,7 +5,7 @@ local logPath = "/storage/emulated/0/Download/DecryptScript.txt"
 function saveDecrypted(text)
     local file = io.open(logPath, "w")  -- Sobrescreve para manter o último script
     if not file then
-        gg.toast("Erro ao salvar o script descriptografado!")  -- Usar toast para erro
+        print("Erro ao salvar o script descriptografado!")  -- Exibe erro no print
         return
     end
     file:write(text .. "\n")
@@ -25,15 +25,15 @@ end
 function tryAllKeys()
     local file = io.open(scriptPath, "r")
     if not file then
-        gg.toast("Erro ao abrir o arquivo de script!")
+        print("Erro ao abrir o arquivo de script!")  -- Exibe erro no print
         return
     end
 
     local content = file:read("*all")
     file:close()
 
-    -- Inicia o diálogo informando que o processo começou (sem pausar o script)
-    gg.toast("Iniciando tentativas de descriptografar, aguarde...")
+    -- Inicia o diálogo informando que o processo começou
+    print("Iniciando tentativas de descriptografar, aguarde...")
 
     -- Total de chaves que vamos testar
     local totalKeys = 100000000  
@@ -47,21 +47,21 @@ function tryAllKeys()
         if isValidScript(decryptedContent) then
             -- Quando a chave correta for encontrada, salva o script e exibe um aviso
             saveDecrypted("[Código Descriptografado - Chave " .. key .. "]:\n" .. decryptedContent)
-            gg.toast("Chave correta encontrada: " .. key)
-            gg.toast("Prosseguindo com a descriptografia no arquivo.")
+            print("Chave correta encontrada: " .. key)  -- Mostra no print a chave correta
+            print("Prosseguindo com a descriptografia no arquivo.")
             return  -- Encerra o loop após encontrar a chave correta
         end
 
         -- Atualiza a porcentagem de progresso a cada iteração
         local progress = (key / totalKeys) * 100
-        gg.toast(string.format("Tentativa %d%% concluída", progress))
+        print(string.format("Tentativa %d%% concluída", progress))  -- Exibe progresso no print
         
         -- Incrementa a chave para a próxima tentativa
         key = key + 1  -- A chave vai de 0 até 99,999,999
     end
 
     -- Caso não encontre nenhuma chave válida
-    gg.toast("Erro: Nenhuma chave válida encontrada. Tentativas terminadas.")
+    print("Erro: Nenhuma chave válida encontrada. Tentativas terminadas.")  -- Exibe erro no print
 end
 
 -- Função para verificar se o conteúdo descriptografado é válido
@@ -74,5 +74,5 @@ function isValidScript(content)
 end
 
 -- Inicia a tentativa de descriptografar com todas as chaves
-gg.toast("Iniciando a tentativa de descriptografar o script... Aguarde...")
+print("Iniciando a tentativa de descriptografar o script... Aguarde...")
 tryAllKeys()
