@@ -1,23 +1,29 @@
 local scriptPath = "/storage/emulated/0/Download/DecryptScript.lua"
-local logPath = "/storage/emulated/0/DecryptScript.txt"
+local logPath = "/storage/emulated/0/Download/DecryptScript.txt"
 
--- Função para salvar logs
-function saveScript(text)
-    local file = io.open(logPath, "a")
+-- Função para salvar código descriptografado
+function saveDecrypted(text)
+    local file = io.open(logPath, "w")  -- Sobrescreve para manter o último script
     if not file then
-        gg.alert("Erro ao salvar o log do script!")
+        gg.alert("Erro ao salvar o script descriptografado!")
         return
     end
     file:write(text .. "\n")
     file:close()
 end
 
--- Função que será chamada para capturar cada linha em tempo real
-function captureExecution(event, line)
-    local info = debug.getinfo(2, "Sln")  -- Obtém informações da linha em execução
-    if info and info.short_src and info.currentline > 0 then
-        saveScript(string.format("[Executando] %s - Linha %d\n", info.short_src, info.currentline))
-    end
+-- Intercepta `load()` para capturar scripts carregados na memória
+local originalLoad = load
+function load(code, ...)
+    saveDecrypted("\n[Código Descriptografado]:\n" .. tostring(code))
+    return originalLoad(code, ...)
+end
+
+-- Intercepta `loadstring()` para capturar códigos ocultos
+local originalLoadString = loadstring
+function loadstring(code, ...)
+    saveDecrypted("\n[Código Descriptografado]:\n" .. tostring(code))
+    return originalLoadString(code, ...)
 end
 
 -- Função para executar a script normalmente
@@ -31,8 +37,8 @@ function executeScript()
     local content = file:read("*all")
     file:close()
 
-    -- Salvar o código original
-    saveScript("[Código Original]:\n" .. content)
+    -- Salvar código original (criptografado)
+    saveDecrypted("[Código Original Criptografado]:\n" .. content)
 
     -- Tenta carregar a script
     local func, err = load(content)
@@ -41,16 +47,12 @@ function executeScript()
         return
     end
 
-    -- Ativa o Hook para capturar cada linha executada
-    debug.sethook(captureExecution, "l")
-
-    gg.toast("Executando script e capturando código descriptografado em tempo real...")
+    gg.toast("Executando script e capturando código descriptografado...")
     
-    -- Executa a script
+    -- Executa a script normalmente
     pcall(func)
-
-    -- Remove o Hook após a execução
-    debug.sethook(nil)
 end
 
+gg.alert("Sistema de Descriptografia Ativado!\nAguarde o processamento...")
 executeScript()
+gg.alert("Script Executado! Código descriptografado salvo em DecryptScript.txt")
