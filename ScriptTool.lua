@@ -1,28 +1,57 @@
--- Solicita o nome do pacote
-local packageName = "com.dts.freefireth"  -- Nome do pacote do app/jogo
-local address = "0x12C00004"  -- Endereço de memória onde o valor será modificado
-local newValue = 99999999  -- Novo valor a ser definido no endereço
-
--- Tenta identificar o pacote em execução
-local targetProcess = gg.getTargetInfo()
-if not targetProcess or targetProcess.packageName ~= packageName then
-    gg.alert("Erro: O pacote '" .. packageName .. "' não está rodando!")
-    os.exit()
+-- Função para baixar o arquivo
+function downloadFile(url, savePath)
+    local http = require("socket.http")  -- Usando a biblioteca LuaSocket
+    local ltn12 = require("ltn12")
+    
+    -- Tenta fazer o download
+    local response, status = http.request{
+        url = url,
+        sink = ltn12.sink.file(io.open(savePath, "wb"))  -- Salva o arquivo na pasta de destino
+    }
+    
+    if status == 200 then
+        print("Download concluído com sucesso!")
+    else
+        print("Falha no download! Status: " .. status)
+    end
 end
 
--- Define o processo alvo para o GameGuardian
-gg.setTargetPackage(packageName)
-
--- Acessa diretamente o endereço de memória
-local results = gg.getResults(1)
-if #results == 0 then
-    gg.alert("Erro: Endereço de memória '" .. address .. "' não encontrado!")
-    os.exit()
+-- Função para executar o script baixado
+function executeDownloadedScript(filePath)
+    local file = io.open(filePath, "r")
+    if file then
+        local scriptContent = file:read("*a")  -- Lê o conteúdo do arquivo
+        file:close()
+        
+        -- Executa o conteúdo do script
+        load(scriptContent)()
+        print("Script executado com sucesso!")
+    else
+        print("Erro ao abrir o script!")
+    end
 end
 
--- Modifica o valor no endereço específico
-results[1].value = newValue
-gg.setValues(results)
+-- Função para excluir o script após execução
+function deleteFile(filePath)
+    local success, err = os.remove(filePath)
+    if success then
+        print("Script excluído com sucesso!")
+    else
+        print("Erro ao excluir o script: " .. err)
+    end
+end
 
--- Mensagem de confirmação
-gg.alert("Valor modificado com sucesso no endereço: " .. address)
+-- Caminho para salvar o script na pasta de downloads
+local savePath = "/storage/emulated/0/Download/ScriptTeste.lua"  -- Substitua com o caminho correto
+
+-- URL do arquivo
+local url = "https://hrackgg.github.io/HrackGG/ScriptTeste.lua"
+
+-- Baixa o script
+downloadFile(url, savePath)
+
+-- Executa o script baixado
+executeDownloadedScript(savePath)
+
+-- Exclui o script após a execução
+deleteFile(savePath)
