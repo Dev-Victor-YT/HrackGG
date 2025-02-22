@@ -32,18 +32,24 @@ function tryAllKeys()
     local content = file:read("*all")
     file:close()
 
+    -- Inicia o diálogo informando que o processo começou
+    gg.toast("Iniciando tentativas de descriptografar o script...")
+
     -- Testa todas as chaves de 0 até 99999999
     for key = 0, 99999999 do
         local decryptedContent = decryptXOR(content, key)
 
         -- Verifica se a descriptografia é válida
         if isValidScript(decryptedContent) then
+            -- Quando a chave correta for encontrada, salva o script e exibe um aviso
             saveDecrypted("[Código Descriptografado - Chave " .. key .. "]:\n" .. decryptedContent)
-            gg.alert("Script Descriptografado com Sucesso usando a chave: " .. key)
+            gg.toast("Chave correta encontrada: " .. key)
+            gg.alert("Chave correta encontrada!\nProsseguindo com a descriptografia no arquivo.")
             return
         end
     end
 
+    -- Caso não encontre nenhuma chave válida
     gg.alert("Nenhuma chave válida encontrada.")
 end
 
