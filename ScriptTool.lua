@@ -1,57 +1,41 @@
--- Caminho pré-definido do arquivo de script
-local scriptPath = "/storage/emulated/0/Download/DecryptScript.lua"  -- Modifique para o caminho correto do seu script
+-- Caminho pré-definido do arquivo de script local scriptPath = "/storage/emulated/0/Download/MeuScript.txt"  -- Modifique para o caminho correto do seu script local logPath = "/storage/emulated/0/DecryptScript.txt"
 
--- Função para executar o script e salvar as ações
-function executeScript()
-    -- Abrir o arquivo de script
-    local file = io.open(scriptPath, "r")
-    if not file then
-        gg.alert("Erro ao abrir o arquivo de script!")
-        return
-    end
+-- Função para executar a script function executeScript() local file = io.open(scriptPath, "r") if not file then gg.alert("Erro ao abrir o arquivo de script!") return end
 
-    -- Ler o conteúdo do arquivo
-    local content = file:read("*all")
-    file:close()
+local content = file:read("*all")
+file:close()
 
-    -- Salvar o conteúdo do script no arquivo DecryptScript.txt
-    saveScript(content)
+-- Salvar o conteúdo da script no arquivo de log
+saveScript(content)
 
-    -- Simular execução do script: Aqui você pode personalizar o comportamento de execução
-    gg.setRanges(gg.REGION_CODE_APP)  -- Define o range de código para a execução do script
-    gg.searchNumber(content)  -- Exemplo de execução (substitua por comandos reais)
+-- Executa a script carregada no GameGuardian
+load(content)()
 
-    -- Durante a execução, o conteúdo do script será constantemente salvo em DecryptScript.txt
-    monitorExecution(content)
+-- Inicia o monitoramento das execuções
+monitorExecution()
+
 end
 
--- Função para salvar o script executado em um arquivo TXT
-function saveScript(content)
-    local file = io.open("/storage/emulated/0/DecryptScript.txt", "w")
-    if not file then
-        gg.alert("Erro ao salvar o arquivo DecryptScript.txt")
-        return
+-- Função para salvar o script executado em um arquivo TXT function saveScript(content) local file = io.open(logPath, "w") if not file then gg.alert("Erro ao salvar o arquivo DecryptScript.txt") return end file:write("Conteúdo do script: ") file:write(content) file:close() end
+
+-- Função para monitorar a execução do script e salvar continuamente as ações function monitorExecution() local file = io.open(logPath, "a") if not file then gg.alert("Erro ao salvar as ações do script!") return end
+
+file:write("\n--- Início da execução ---\n")
+
+while true do
+    local results = gg.getResults(100)
+    if results and #results > 0 then
+        for i, v in ipairs(results) do
+            file:write(string.format("Endereço: 0x%X, Valor: %s\n", v.address, v.value))
+        end
     end
-    file:write("Conteúdo do script:\n")
-    file:write(content)
-    file:close()
+    gg.sleep(1000)  -- Aguarda 1 segundo antes de verificar novamente
 end
 
--- Função para monitorar a execução do script e salvar continuamente as ações
-function monitorExecution(content)
-    local file = io.open("/storage/emulated/0/Download/DecryptScript.txt", "a")
-    if not file then
-        gg.alert("Erro ao salvar as ações do script!")
-        return
-    end
+file:write("\n--- Fim da execução ---\n")
+file:close()
 
-    -- Aqui você pode adicionar mais ações do script conforme ele vai sendo executado
-    -- Abaixo é apenas um exemplo simples de como você pode salvar mensagens de execução
-    file:write("\n--- Início da execução ---\n")
-    file:write("Executando o script: " .. content .. "\n")
-    file:write("\n--- Fim da execução ---\n")
-    file:close()
 end
 
--- Inicia o processo automaticamente sem interação do usuário
-executeScript()
+-- Inicia o processo automaticamente sem interação do usuário executeScript()
+
