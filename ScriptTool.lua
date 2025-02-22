@@ -36,7 +36,7 @@ function tryAllKeys()
     print("Iniciando tentativas de descriptografar, aguarde...")
 
     -- Total de chaves que vamos testar
-    local totalKeys = 999 
+    local totalKeys = 999999 
 
     -- Loop contínuo até encontrar a chave correta
     local key = 0  -- Inicia com a chave 0
