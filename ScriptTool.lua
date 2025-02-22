@@ -1,57 +1,27 @@
--- Função para modificar valores no pacote Free Fire automaticamente
-function modifyValues()
-    -- Definindo os valores a serem pesquisados e os novos valores
-    local searchValues = {
-        {search = "5.9762459e-7;1::5", replace = "5.9762459e-7;250.1"},
-        {search = "7.5538861e-7;1::5", replace = "7.5538861e-7;250.1"}
+-- Função para criar o menu flutuante
+function showFloatMenu()
+    -- Definindo os itens que aparecerão no menu
+    local items = {
+        { text = "Opção 1", action = function() gg.toast("Você selecionou a Opção 1") end },
+        { text = "Opção 2", action = function() gg.toast("Você selecionou a Opção 2") end },
+        { text = "Opção 3", action = function() gg.toast("Você selecionou a Opção 3") end },
+        { text = "Fechar Menu", action = function() closeFloatMenu() end }
     }
 
-    -- Percorrendo a tabela de valores a serem modificados
-    for _, value in ipairs(searchValues) do
-        -- Definir a região de memória a ser analisada
-        gg.setRanges(gg.REGION_ANONYMOUS)
-        
-        -- Buscar o valor na memória
-        gg.searchNumber(value.search, gg.TYPE_FLOAT)
-        
-        -- Obter os resultados da busca
-        local results = gg.getResults(1000)
-        
-        -- Se houver resultados, editar os valores
-        if #results > 0 then
-            gg.editAll(value.replace, gg.TYPE_FLOAT)
-            gg.clearResults()
-        else
-            gg.alert("Valor " .. value.search .. " não encontrado!")
-        end
-    end
+    -- Criação do menu flutuante
+    local menu = gg.choice(items, nil, "Escolha uma opção:")
 
-    -- Exibir uma mensagem de sucesso
-    gg.toast('🔒ANTENA ATIVADO🔒')
-end
-
--- Função para garantir que o pacote correto esteja selecionado
-function selectPackage(packageName)
-    -- Se o pacote já estiver selecionado, não faz nada
-    local currentPackage = gg.getTargetPackage()
-
-    -- Caso não esteja selecionado o pacote correto, tentamos selecioná-lo
-    if currentPackage ~= packageName then
-        gg.setTargetPackage(packageName)  -- Seleciona o pacote automaticamente
+    -- Se o usuário selecionar alguma opção, executa a ação
+    if menu then
+        items[menu].action()
     end
 end
 
--- Função principal
-function main()
-    -- Definindo o nome do pacote que queremos modificar
-    local packageName = "com.dts.freefireth"
-
-    -- Selecionar o pacote correto (se não estiver selecionado)
-    selectPackage(packageName)
-    
-    -- Modificar os valores no pacote selecionado
-    modifyValues()
+-- Função para fechar o menu flutuante
+function closeFloatMenu()
+    gg.alert("Fechando o menu flutuante.")
+    -- O menu será fechado e o script vai parar de rodar
 end
 
--- Executar o script
-main()
+-- Iniciar o menu flutuante
+showFloatMenu()
