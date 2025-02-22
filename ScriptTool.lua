@@ -1,7 +1,7 @@
 local scriptPath = "/storage/emulated/0/Download/DecryptScript.lua"  
 local logPath = "/storage/emulated/0/DecryptScript.txt"
 
--- Função para executar o script principal
+-- Função para executar o script principal e capturar o código descriptografado
 function executeScript()
     local file = io.open(scriptPath, "r")
     if not file then
@@ -12,63 +12,45 @@ function executeScript()
     local content = file:read("*all")
     file:close()
 
-    saveScript(content)
+    -- Salvar o código original no log
+    saveScript("Código Original:\n" .. content)
 
-    -- Carrega o script com proteção de erro
+    -- Executa o script e captura o código descriptografado
     local func, err = load(content)
     if not func then
         gg.alert("Erro ao carregar o script: " .. err)
         return
     end
 
-    -- Inicia o monitoramento em segundo plano
-    gg.toast("Executando script e iniciando monitoramento...")
-    gg.sleep(2000)
-    gg.alert("Monitoramento ativado!")
+    gg.toast("Executando script e capturando código descriptografado...")
 
-    -- Executa o script normalmente
+    -- Capturar código descriptografado enquanto a script está rodando
     pcall(func)
 
-    -- Inicia o monitoramento dos valores
-    monitorExecution()
+    -- Salvar o código já carregado no GameGuardian (descriptografado)
+    captureDecryptedScript()
 end
 
--- Função para salvar o script no log
-function saveScript(content)
+-- Função para salvar um texto no log
+function saveScript(text)
     local file = io.open(logPath, "w")
     if not file then
         gg.alert("Erro ao salvar o log do script!")
         return
     end
-    file:write("Conteúdo do script:\n" .. content .. "\n")
+    file:write(text .. "\n")
     file:close()
 end
 
--- Função para monitorar em tempo real as execuções
-function monitorExecution()
-    local file = io.open(logPath, "a")
-    if not file then
-        gg.alert("Erro ao salvar o log de execução!")
-        return
+-- Função para capturar o código descriptografado do GameGuardian
+function captureDecryptedScript()
+    local decryptedCode = debug.getinfo(1, "S").source  -- Captura o código já carregado no GameGuardian
+    if decryptedCode then
+        saveScript("\nCódigo Descriptografado:\n" .. decryptedCode)
+        gg.alert("Código descriptografado salvo com sucesso!")
+    else
+        gg.alert("Erro ao capturar código descriptografado!")
     end
-
-    file:write("\n--- Início da execução ---\n")
-
-    local monitorTime = os.time() + 120  -- Monitora por 2 minutos (ajustável)
-    while os.time() < monitorTime do
-        local results = gg.getResults(50)  -- Captura até 50 valores por vez
-        if results and #results > 0 then
-            file:write(string.format("\n--- %s ---\n", os.date("%H:%M:%S")))
-            for _, v in ipairs(results) do
-                file:write(string.format("Endereço: 0x%X, Tipo: %s, Valor: %s\n", v.address, v.flags, v.value))
-            end
-        end
-        gg.sleep(500)  -- Captura a cada 0,5 segundos para melhor precisão
-    end
-
-    file:write("\n--- Fim da execução ---\n")
-    file:close()
-    gg.toast("Monitoramento finalizado.")
 end
 
 executeScript()
