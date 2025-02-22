@@ -1,7 +1,7 @@
 -- Solicita o nome do pacote
 local packageName = "com.dts.freefireth"  -- Nome do pacote do app/jogo
-local address = "0x000000"  -- Endereço de memória onde o valor será modificado
-local newValue = 0  -- Novo valor a ser definido no endereço
+local address = "0x12C00004"  -- Endereço de memória onde o valor será modificado
+local newValue = 99999999  -- Novo valor a ser definido no endereço
 
 -- Tenta identificar o pacote em execução
 local targetProcess = gg.getTargetInfo()
