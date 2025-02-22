@@ -41,5 +41,6 @@ file:close()
 
 end
 
--- Inicia o processo automaticamente sem interação do usuário executeScript()
+-- Inicia o processo automaticamente sem interação do usuário
+executeScript()
 
