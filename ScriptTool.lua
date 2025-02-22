@@ -1,69 +1,72 @@
--- Caminho para salvar os dados capturados
-local logPath = "/storage/emulated/0/Download/values_from_script.txt"
-
--- Função para salvar os dados no arquivo
-function saveCapturedData(data)
-    local file, err = io.open(logPath, "a")
-    if not file then
-        print("Erro ao salvar os dados: " .. err)
+-- Função para selecionar o pacote do aplicativo
+function selectPackage()
+    local package = gg.prompt({'Digite o nome do pacote do aplicativo (ex: com.exemplo.app)'}, nil, {'text'})
+    if not package then
+        gg.alert("Nome do pacote não fornecido.")
         return
     end
-    file:write(data .. "\n")
-    file:close()
+    return package[1]
 end
 
--- Função para capturar os valores em execução no GameGuardian
-function captureScriptValues()
-    -- Pegando os valores e endereços dos valores que estão sendo manipulados
-    local results = gg.getResults(100)  -- Captura 100 resultados por vez
+-- Função para selecionar o valor a ser pesquisado
+function selectSearchValue()
+    local searchValue = gg.prompt({'Digite o valor que você quer pesquisar (ex: 1000)'}, nil, {'number'})
+    if not searchValue or searchValue[1] == "" then
+        gg.alert("Valor de pesquisa não fornecido.")
+        return
+    end
+    return tonumber(searchValue[1])
+end
+
+-- Função para selecionar o novo valor a ser alterado
+function selectNewValue()
+    local newValue = gg.prompt({'Digite o novo valor para substituir (ex: 999999)'}, nil, {'number'})
+    if not newValue or newValue[1] == "" then
+        gg.alert("Novo valor não fornecido.")
+        return
+    end
+    return tonumber(newValue[1])
+end
+
+-- Função para pesquisar e modificar o valor no aplicativo
+function modifyValue(package, targetValue, newValue)
+    -- Procurar pelo nome do pacote, para garantir que estamos no contexto correto
+    gg.setRanges(gg.REGION_C_ALLOC)
+    gg.searchNumber(targetValue, gg.TYPE_DWORD)
     
-    if not results or #results == 0 then
-        print("Nenhum valor encontrado.")
+    -- Verificar se o valor foi encontrado
+    local results = gg.getResults(100)
+    if #results == 0 then
+        gg.alert("Nenhum valor encontrado para " .. targetValue)
         return
     end
     
-    local capturedData = {}
-    
-    -- Coletando os endereços e valores
+    -- Modificar os valores encontrados
     for _, v in ipairs(results) do
-        local value = v.value
-        local address = v.address
-        local description = "Valor não descrito"
-        
-        -- Criar uma descrição baseada no valor (aqui você pode customizar como quiser)
-        if value >= 1000000 then
-            description = "Provavelmente um contador alto"
-        elseif value == 1 then
-            description = "Valor binário"
-        elseif value == 0 then
-            description = "Valor neutro"
-        end
-        
-        -- Formatar os dados para salvar
-        local data = string.format("Endereço: 0x%X, Valor: %d, Descrição: %s", address, value, description)
-        table.insert(capturedData, data)
+        -- Substituir o valor no endereço encontrado
+        gg.editAll(newValue, gg.TYPE_DWORD)
     end
     
-    -- Salvando todos os dados no arquivo
-    for _, data in ipairs(capturedData) do
-        saveCapturedData(data)
-    end
-    
-    -- Exibindo os dados no console
-    for _, data in ipairs(capturedData) do
-        print(data)
-    end
+    gg.alert("Valores modificados com sucesso!")
 end
 
--- Função principal para capturar os valores
-function startCapture()
-    print("Iniciando captura de valores da script Lua em execução.")
+-- Função principal
+function main()
+    -- Escolher o pacote do aplicativo
+    local package = selectPackage()
+    if not package then return end
     
-    -- Iniciar captura dos valores da script Lua
-    captureScriptValues()
+    -- Selecionar o valor que será pesquisado
+    local targetValue = selectSearchValue()
+    if not targetValue then return end
     
-    print("Captura finalizada.")
+    -- Selecionar o novo valor a ser alterado
+    local newValue = selectNewValue()
+    if not newValue then return end
+    
+    -- Modificar o valor no aplicativo
+    modifyValue(package, targetValue, newValue)
 end
 
--- Iniciar o processo de captura
-startCapture()
+-- Executar o script
+main()
