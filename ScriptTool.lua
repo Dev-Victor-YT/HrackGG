@@ -1,71 +1,42 @@
--- Solicita o nome do pacote ao usuário
+-- Verifica se o dispositivo está com root
+local rootCheck = io.popen("which su")
+local root = rootCheck:read("*l")
+rootCheck:close()
+
+if not root then
+    gg.alert("Erro: O dispositivo precisa ser rootado para executar esse script!")
+    os.exit()
+end
+
+-- Define a variável do pacote que queremos modificar
 local packageName = gg.prompt({"Digite o nome do pacote do jogo/aplicativo:"}, {""}, {"text"})
 
--- Se o usuário não digitou nada, aborta
 if not packageName or packageName[1] == "" then
     gg.alert("Erro: Nenhum nome de pacote inserido!")
     os.exit()
 end
 
-local packageNameInput = packageName[1]
+-- Usando comando root para procurar o PID do processo
+local pidCommand = "ps | grep " .. packageName[1]
+local pid = io.popen(pidCommand):read("*l")
 
--- Obtém o processo ativo do pacote informado
-local processFound = false
-local processID = gg.getTargetInfo().packageName
-
-if processID == packageNameInput then
-    processFound = true
-end
-
--- Se o pacote não foi encontrado, exibe erro e sai
-if not processFound then
-    gg.alert("Erro: O pacote '" .. packageNameInput .. "' não está rodando!\nAbra o jogo/app primeiro e tente novamente.")
+if not pid then
+    gg.alert("Erro: O pacote '" .. packageName[1] .. "' não está rodando!")
     os.exit()
 end
 
-gg.alert("Pacote '" .. packageNameInput .. "' encontrado e selecionado com sucesso!")
+-- Exibe o PID encontrado
+gg.alert("Processo encontrado! PID: " .. pid)
 
--- Solicita o valor a ser pesquisado
-local searchValue = gg.prompt({"Digite o valor a ser pesquisado:"}, {""}, {"number"})
+-- Comando para localizar o valor na memória
+local searchCommand = "cat /proc/" .. pid .. "/maps"
+local mapsData = io.popen(searchCommand):read("*all")
 
-if not searchValue or searchValue[1] == "" then
-    gg.alert("Erro: Nenhum valor inserido!")
-    os.exit()
-end
+-- Aqui você poderia buscar por áreas de memória específicas e valores
+-- Por exemplo, modificar valores em regiões específicas da memória do processo
+local modifyCommand = "echo 'NovoValor' > /proc/" .. pid .. "/mem"
 
-local searchNumber = tonumber(searchValue[1])
-if not searchNumber then
-    gg.alert("Erro: Valor inválido!")
-    os.exit()
-end
+-- Exemplo de como enviar um comando para modificar a memória (supondo que o valor tenha sido encontrado)
+os.execute(modifyCommand)
 
--- Pesquisa o valor na memória
-gg.searchNumber(searchNumber, gg.TYPE_DWORD)
-
--- Verifica se encontrou resultados
-local results = gg.getResults(1)
-
-if #results == 0 then
-    gg.alert("Erro: Nenhum valor encontrado!")
-    os.exit()
-end
-
--- Solicita o novo valor a ser inserido
-local newValueInput = gg.prompt({"Digite o novo valor:"}, {""}, {"number"})
-
-if not newValueInput or newValueInput[1] == "" then
-    gg.alert("Erro: Nenhum novo valor inserido!")
-    os.exit()
-end
-
-local newValue = tonumber(newValueInput[1])
-if not newValue then
-    gg.alert("Erro: Novo valor inválido!")
-    os.exit()
-end
-
--- Modifica o valor na memória
-results[1].value = newValue
-gg.setValues(results)
-
-gg.alert("Valor modificado com sucesso!\nDe: " .. searchNumber .. "\nPara: " .. newValue)
+gg.alert("Valor modificado com sucesso!")
