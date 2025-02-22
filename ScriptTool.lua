@@ -12,12 +12,12 @@ function saveScript(text)
     file:close()
 end
 
--- Interceptar a função "load" para capturar código descriptografado
-local originalLoad = load
-function load(code, ...)
-    -- Salva o código que foi carregado para execução
-    saveScript("\n[Código Descriptografado Capturado]:\n" .. tostring(code))
-    return originalLoad(code, ...)
+-- Função que será chamada para capturar cada linha em tempo real
+function captureExecution(event, line)
+    local info = debug.getinfo(2, "Sln")  -- Obtém informações da linha em execução
+    if info and info.short_src and info.currentline > 0 then
+        saveScript(string.format("[Executando] %s - Linha %d\n", info.short_src, info.currentline))
+    end
 end
 
 -- Função para executar a script normalmente
@@ -34,15 +34,23 @@ function executeScript()
     -- Salvar o código original
     saveScript("[Código Original]:\n" .. content)
 
-    -- Executar script normalmente
+    -- Tenta carregar a script
     local func, err = load(content)
     if not func then
         gg.alert("Erro ao carregar a script: " .. err)
         return
     end
 
-    gg.toast("Executando script e capturando código descriptografado...")
+    -- Ativa o Hook para capturar cada linha executada
+    debug.sethook(captureExecution, "l")
+
+    gg.toast("Executando script e capturando código descriptografado em tempo real...")
+    
+    -- Executa a script
     pcall(func)
+
+    -- Remove o Hook após a execução
+    debug.sethook(nil)
 end
 
 executeScript()
