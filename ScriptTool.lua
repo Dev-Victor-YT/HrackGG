@@ -1,71 +1,56 @@
--- Função para selecionar o pacote do aplicativo
-function selectPackage()
-    local package = gg.prompt({'Digite o nome do pacote do aplicativo (ex: com.exemplo.app)'}, nil, {'text'})
-    if not package then
-        gg.alert("Nome do pacote não fornecido.")
-        return
+-- Função para modificar valores no pacote Free Fire automaticamente
+function modifyValues()
+    -- Definindo os valores a serem pesquisados e os novos valores
+    local searchValues = {
+        {search = "5.9762459e-7;1::5", replace = "5.9762459e-7;250.1"},
+        {search = "7.5538861e-7;1::5", replace = "7.5538861e-7;250.1"}
+    }
+
+    -- Percorrendo a tabela de valores a serem modificados
+    for _, value in ipairs(searchValues) do
+        -- Definir a região de memória a ser analisada
+        gg.setRanges(gg.REGION_ANONYMOUS)
+        
+        -- Buscar o valor na memória
+        gg.searchNumber(value.search, gg.TYPE_FLOAT)
+        
+        -- Obter os resultados da busca
+        local results = gg.getResults(1000)
+        
+        -- Se houver resultados, editar os valores
+        if #results > 0 then
+            gg.editAll(value.replace, gg.TYPE_FLOAT)
+            gg.clearResults()
+        else
+            gg.alert("Valor " .. value.search .. " não encontrado!")
+        end
     end
-    return package[1]
+
+    -- Exibir uma mensagem de sucesso
+    gg.toast('🔒ANTENA ATIVADO🔒')
 end
 
--- Função para selecionar o valor a ser pesquisado
-function selectSearchValue()
-    local searchValue = gg.prompt({'Digite o valor que você quer pesquisar (ex: 1000)'}, nil, {'number'})
-    if not searchValue or searchValue[1] == "" then
-        gg.alert("Valor de pesquisa não fornecido.")
-        return
-    end
-    return tonumber(searchValue[1])
-end
+-- Função para garantir que o pacote correto esteja selecionado
+function selectPackage(packageName)
+    -- Se o pacote já estiver selecionado, não faz nada
+    local currentPackage = gg.getTargetPackage()
 
--- Função para selecionar o novo valor a ser alterado
-function selectNewValue()
-    local newValue = gg.prompt({'Digite o novo valor para substituir (ex: 999999)'}, nil, {'number'})
-    if not newValue or newValue[1] == "" then
-        gg.alert("Novo valor não fornecido.")
-        return
+    -- Caso não esteja selecionado o pacote correto, tentamos selecioná-lo
+    if currentPackage ~= packageName then
+        gg.setTargetPackage(packageName)  -- Seleciona o pacote automaticamente
     end
-    return tonumber(newValue[1])
-end
-
--- Função para pesquisar e modificar o valor no aplicativo
-function modifyValue(package, targetValue, newValue)
-    -- Procurar pelo nome do pacote, para garantir que estamos no contexto correto
-    gg.setRanges(gg.REGION_C_ALLOC)
-    gg.searchNumber(targetValue, gg.TYPE_DWORD)
-    
-    -- Verificar se o valor foi encontrado
-    local results = gg.getResults(100)
-    if #results == 0 then
-        gg.alert("Nenhum valor encontrado para " .. targetValue)
-        return
-    end
-    
-    -- Modificar os valores encontrados
-    for _, v in ipairs(results) do
-        -- Substituir o valor no endereço encontrado
-        gg.editAll(newValue, gg.TYPE_DWORD)
-    end
-    
-    gg.alert("Valores modificados com sucesso!")
 end
 
 -- Função principal
 function main()
-    -- Escolher o pacote do aplicativo
-    local package = selectPackage()
-    if not package then return end
+    -- Definindo o nome do pacote que queremos modificar
+    local packageName = "com.dts.freefireth"
+
+    -- Selecionar o pacote correto (se não estiver selecionado)
+    selectPackage(packageName)
     
-    -- Selecionar o valor que será pesquisado
-    local targetValue = selectSearchValue()
-    if not targetValue then return end
-    
-    -- Selecionar o novo valor a ser alterado
-    local newValue = selectNewValue()
-    if not newValue then return end
-    
-    -- Modificar o valor no aplicativo
-    modifyValue(package, targetValue, newValue)
+    -- Modificar os valores no pacote selecionado
+    modifyValues()
 end
 
 -- Executar o script
