@@ -18,9 +18,11 @@ monitorExecution()
 
 end
 
--- Função para salvar o script executado em um arquivo TXT function saveScript(content) local file = io.open(logPath, "w") if not file then gg.alert("Erro ao salvar o arquivo DecryptScript.txt") return end file:write("Conteúdo do script: ") file:write(content) file:close() end
+-- Função para salvar o script executado em um arquivo TXT
+function saveScript(content) local file = io.open(logPath, "w") if not file then gg.alert("Erro ao salvar o arquivo DecryptScript.txt") return end file:write("Conteúdo do script: ") file:write(content) file:close() end
 
--- Função para monitorar a execução do script e salvar continuamente as ações function monitorExecution() local file = io.open(logPath, "a") if not file then gg.alert("Erro ao salvar as ações do script!") return end
+-- Função para monitorar a execução do script e salvar continuamente as ações
+function monitorExecution() local file = io.open(logPath, "a") if not file then gg.alert("Erro ao salvar as ações do script!") return end
 
 file:write("\n--- Início da execução ---\n")
 
