@@ -14,8 +14,7 @@ end
 -- Função para obter uma descrição do valor de memória
 function getDescription(value)
     -- Aqui você pode customizar como deseja descrever o valor.
-    -- Por exemplo, se o valor for grande (como números de 1 bilhão), você pode dizer que é um "contador de moedas" ou algo relacionado.
-    
+    -- Exemplo de descrição com base no valor
     if value >= 1000000000 then
         return "Possivelmente um grande contador (ex: moedas)"
     elseif value >= 1000000 then
@@ -36,24 +35,38 @@ function captureValuesAndAddresses(packageName)
         return
     end
     
-    -- Pegando todos os endereços e valores da memória
-    local results = gg.getResults(100)  -- Você pode ajustar esse número de resultados conforme necessário
-    if not results or #results == 0 then
-        gg.alert("Nenhum valor encontrado.")
-        return
+    -- Captura contínua até obter um número razoável de resultados
+    local totalResults = 0
+    local maxResults = 1000  -- Defina um número maior de valores que você quer capturar
+    local capturedData = {}
+    
+    while totalResults < maxResults do
+        -- Captura os valores na memória
+        local results = gg.getResults(100)  -- Captura 100 resultados de cada vez
+        
+        if not results or #results == 0 then
+            break  -- Se não encontrar mais resultados, sai do loop
+        end
+        
+        -- Adiciona os resultados encontrados à lista de dados capturados
+        for _, v in ipairs(results) do
+            totalResults = totalResults + 1
+            -- Obter a descrição do valor
+            local description = getDescription(v.value)
+
+            -- Formatar e salvar as informações no arquivo de log
+            local data = string.format("Endereço: 0x%X, Valor: %d, Descrição: %s", v.address, v.value, description)
+            table.insert(capturedData, data)
+        end
+    end
+    
+    -- Salva todos os dados capturados de uma vez
+    for _, data in ipairs(capturedData) do
+        saveCapturedData(data)
     end
 
-    -- Processando os valores encontrados
-    print("Capturando endereços e valores...")
-    for _, v in ipairs(results) do
-        -- Obter a descrição do valor
-        local description = getDescription(v.value)
-
-        -- Formatar e salvar as informações no arquivo de log
-        local data = string.format("Endereço: 0x%X, Valor: %d, Descrição: %s", v.address, v.value, description)
-        saveCapturedData(data)
-
-        -- Exibir o que foi salvo no console para confirmação
+    -- Exibe os dados capturados no console
+    for _, data in ipairs(capturedData) do
         print(data)
     end
 end
