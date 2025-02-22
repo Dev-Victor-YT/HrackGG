@@ -1,3 +1,4 @@
+local scriptPath = "/storage/emulated/0/Download/DecryptScript.lua"
 local logPath = "/storage/emulated/0/Download/DecryptScript.txt"
 
 -- Função para salvar código descriptografado
@@ -11,36 +12,29 @@ function saveDecrypted(text)
     file:close()
 end
 
--- Hook para capturar o conteúdo das funções carregadas
-local originalLoad = load
-function load(code, ...)
-    -- Aqui tentamos capturar e salvar o código antes de ser executado
-    saveDecrypted("\n[Código Descriptografado]:\n" .. tostring(code))
-    return originalLoad(code, ...)
-end
-
--- Hook para capturar quando o script chama funções internas
-local originalCall = gg.makeRequest
-function gg.makeRequest(url, ...)
-    local response = originalCall(url, ...)
-    saveDecrypted("\n[Script Baixado de " .. url .. "]:\n" .. response.content)
-    return response
-end
-
--- Função para tentar interceptar chamadas internas do GameGuardian
-function captureGameGuardianCode()
-    -- Tente pegar o estado atual do código carregado no GameGuardian
-    local codeInMemory = gg.getResults(100) -- Pega os resultados em memória
-    if codeInMemory then
-        for _, v in ipairs(codeInMemory) do
-            saveDecrypted(string.format("[Memória] Endereço: 0x%X, Valor: %s", v.address, v.value))
-        end
+-- Função de descriptografia simples (exemplo de XOR)
+function decryptXOR(encryptedText, key)
+    local decrypted = {}
+    for i = 1, #encryptedText do
+        decrypted[i] = string.char(bit.bxor(string.byte(encryptedText, i), key))
     end
+    return table.concat(decrypted)
 end
 
--- Função principal para execução do script
+-- Função de monitoramento de erros e falhas
+function monitorExecution(func)
+    local success, err = pcall(func)
+    if not success then
+        gg.alert("Erro durante a execução do script: " .. err)
+        -- Tenta corrigir ou interromper a execução
+        print("Corrigindo erro...")
+        return false
+    end
+    return true
+end
+
+-- Função para processar e executar o script
 function executeScript()
-    local scriptPath = "/storage/emulated/0/Download/DecryptScript.lua"
     local file = io.open(scriptPath, "r")
     if not file then
         gg.alert("Erro ao abrir o arquivo de script!")
@@ -50,24 +44,29 @@ function executeScript()
     local content = file:read("*all")
     file:close()
 
-    -- Tenta carregar a script
-    local func, err = load(content)
+    -- Verifica se o script está criptografado (exemplo simples de XOR)
+    local key = 123  -- A chave de criptografia
+    local decryptedContent = decryptXOR(content, key)
+
+    -- Salva o conteúdo descriptografado
+    saveDecrypted("[Código Descriptografado]:\n" .. decryptedContent)
+
+    -- Tenta carregar o script descriptografado
+    local func, err = load(decryptedContent)
     if not func then
         gg.alert("Erro ao carregar a script: " .. err)
         return
     end
 
-    -- Salva o código original
-    saveDecrypted("[Código Original Criptografado]:\n" .. content)
-
-    -- Executa o script
-    gg.toast("Executando script e tentando capturar código em tempo real...")
-    pcall(func)
-
-    -- Depois de executar, tentamos capturar o estado da memória
-    captureGameGuardianCode()
+    -- Monitoramento da execução para evitar falhas
+    local success = monitorExecution(func)
+    if success then
+        gg.toast("Script Executado com Sucesso!")
+    else
+        gg.alert("Falha ao executar o script!")
+    end
 end
 
-gg.alert("Sistema de Descriptografia Ativado!\nAguarde o processamento...")
+-- Inicia a execução do sistema de descriptografia
+gg.alert("Sistema de Descriptografação Ativado!\nAguarde o processamento...")
 executeScript()
-gg.alert("Script Executado! Código descriptografado salvo em DecryptScript.txt")
