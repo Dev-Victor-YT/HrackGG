@@ -45,7 +45,7 @@ end
 local savePath = "/storage/emulated/0/Download/ScriptTeste.lua"  -- Substitua com o caminho correto
 
 -- URL do arquivo
-local url = "https://hrackgg.github.io/HrackGG/ScriptTeste.lua"
+local url = "https://download948.mediafire.com/y8jd4q60d4ugrYfIlA-63F3tXJx3oZLIsAfdZTW_tPO4s1XelGG2hslZRzp6-7tBjfCi-gb_Yo5OdRYbIa5PKx1LCtyBZMHYoHrTGRDMqp4DCNA48oUXhpFrvtBoiRXoF27dWENqP1WT5R4qDI71Fwzgr89pHHFht9lzu31fMlC2wA/umhvmdkvjshi7u1/TUDO+PARA+SCRIPT.zip"
 
 -- Baixa o script
 downloadFile(url, savePath)
