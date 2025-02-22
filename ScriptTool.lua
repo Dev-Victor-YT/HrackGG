@@ -1,6 +1,7 @@
-local logPath = "/storage/emulated/0/Download/memory_values.txt"  -- Caminho para salvar os dados coletados
+-- Caminho para salvar os dados capturados
+local logPath = "/storage/emulated/0/Download/values_from_script.txt"
 
--- Função para salvar os endereços e valores no arquivo de log
+-- Função para salvar os dados no arquivo
 function saveCapturedData(data)
     local file, err = io.open(logPath, "a")
     if not file then
@@ -11,80 +12,58 @@ function saveCapturedData(data)
     file:close()
 end
 
--- Função para obter uma descrição do valor de memória
-function getDescription(value)
-    -- Aqui você pode customizar como deseja descrever o valor.
-    -- Exemplo de descrição com base no valor
-    if value >= 1000000000 then
-        return "Possivelmente um grande contador (ex: moedas)"
-    elseif value >= 1000000 then
-        return "Possivelmente um contador médio"
-    elseif value == 1 then
-        return "Valor binário (ligado ou verdadeiro)"
-    else
-        return "Valor genérico"
-    end
-end
-
--- Função para capturar todos os valores e endereços do aplicativo
-function captureValuesAndAddresses(packageName)
-    -- Selecione o aplicativo com o nome do pacote
-    local appInfo = gg.getTargetInfo()
-    if appInfo.packageName ~= packageName then
-        gg.alert("Pacote não corresponde ao selecionado.")
+-- Função para capturar os valores em execução no GameGuardian
+function captureScriptValues()
+    -- Pegando os valores e endereços dos valores que estão sendo manipulados
+    local results = gg.getResults(100)  -- Captura 100 resultados por vez
+    
+    if not results or #results == 0 then
+        print("Nenhum valor encontrado.")
         return
     end
     
-    -- Captura contínua até obter um número razoável de resultados
-    local totalResults = 0
-    local maxResults = 1000  -- Defina um número maior de valores que você quer capturar
     local capturedData = {}
     
-    while totalResults < maxResults do
-        -- Captura os valores na memória
-        local results = gg.getResults(100)  -- Captura 100 resultados de cada vez
+    -- Coletando os endereços e valores
+    for _, v in ipairs(results) do
+        local value = v.value
+        local address = v.address
+        local description = "Valor não descrito"
         
-        if not results or #results == 0 then
-            break  -- Se não encontrar mais resultados, sai do loop
+        -- Criar uma descrição baseada no valor (aqui você pode customizar como quiser)
+        if value >= 1000000 then
+            description = "Provavelmente um contador alto"
+        elseif value == 1 then
+            description = "Valor binário"
+        elseif value == 0 then
+            description = "Valor neutro"
         end
         
-        -- Adiciona os resultados encontrados à lista de dados capturados
-        for _, v in ipairs(results) do
-            totalResults = totalResults + 1
-            -- Obter a descrição do valor
-            local description = getDescription(v.value)
-
-            -- Formatar e salvar as informações no arquivo de log
-            local data = string.format("Endereço: 0x%X, Valor: %d, Descrição: %s", v.address, v.value, description)
-            table.insert(capturedData, data)
-        end
+        -- Formatar os dados para salvar
+        local data = string.format("Endereço: 0x%X, Valor: %d, Descrição: %s", address, value, description)
+        table.insert(capturedData, data)
     end
     
-    -- Salva todos os dados capturados de uma vez
+    -- Salvando todos os dados no arquivo
     for _, data in ipairs(capturedData) do
         saveCapturedData(data)
     end
-
-    -- Exibe os dados capturados no console
+    
+    -- Exibindo os dados no console
     for _, data in ipairs(capturedData) do
         print(data)
     end
 end
 
--- Função principal para iniciar a captura
+-- Função principal para capturar os valores
 function startCapture()
-    -- Escolher o pacote do aplicativo
-    local packageName = gg.prompt({"Digite o nome do pacote do aplicativo"}, {""}, {"text"})[1]
+    print("Iniciando captura de valores da script Lua em execução.")
     
-    -- Se o nome do pacote for vazio, interromper
-    if not packageName or packageName == "" then
-        gg.alert("Nome do pacote não fornecido.")
-        return
-    end
+    -- Iniciar captura dos valores da script Lua
+    captureScriptValues()
     
-    -- Iniciar captura de valores e endereços do aplicativo
-    captureValuesAndAddresses(packageName)
+    print("Captura finalizada.")
 end
 
--- Iniciar o processo
+-- Iniciar o processo de captura
 startCapture()
