@@ -21,7 +21,7 @@ function decryptXOR(encryptedText, key)
     return table.concat(decrypted)
 end
 
--- Função para tentar todas as chaves de 0 a 99999999
+-- Função para tentar todas as chaves de 0 a 99999999 (loop contínuo até achar a chave)
 function tryAllKeys()
     local file = io.open(scriptPath, "r")
     if not file then
@@ -35,9 +35,12 @@ function tryAllKeys()
     -- Inicia o diálogo informando que o processo começou (sem pausar o script)
     gg.toast("Iniciando tentativas de descriptografar, aguarde...")
 
-    -- Testa todas as chaves de 0 até 99999999 e mostra progresso
-    local totalKeys = 100000000  -- Total de chaves que vamos testar
-    for key = 0, totalKeys - 1 do
+    -- Total de chaves que vamos testar
+    local totalKeys = 100000000  
+
+    -- Loop contínuo até encontrar a chave correta
+    local key = 0  -- Inicia com a chave 0
+    while key < totalKeys do
         local decryptedContent = decryptXOR(content, key)
 
         -- Verifica se a descriptografia é válida
@@ -52,6 +55,9 @@ function tryAllKeys()
         -- Atualiza a porcentagem de progresso a cada iteração
         local progress = (key / totalKeys) * 100
         gg.toast(string.format("Tentativa %d%% concluída", progress))
+        
+        -- Incrementa a chave para a próxima tentativa
+        key = key + 1  -- A chave vai de 0 até 99,999,999
     end
 
     -- Caso não encontre nenhuma chave válida
