@@ -1,76 +1,77 @@
-local scriptPath = "/storage/emulated/0/Download/DecryptScript.lua"
-local logPath = "/storage/emulated/0/Download/cript_valor.txt"
+local logPath = "/storage/emulated/0/Download/memory_values.txt"  -- Caminho para salvar os dados coletados
 
--- Função para salvar os endereços e valores alterados no arquivo
+-- Função para salvar os endereços e valores no arquivo de log
 function saveCapturedData(data)
-    local file, err = io.open(logPath, "a")  -- Abre o arquivo para adicionar as informações
+    local file, err = io.open(logPath, "a")
     if not file then
-        print("Erro ao salvar os dados: " .. err)  -- Exibe erro no print se falhar
+        print("Erro ao salvar os dados: " .. err)
         return
     end
     file:write(data .. "\n")
     file:close()
 end
 
--- Função para executar o script e monitorar alterações na memória
-function executeScriptAndMonitorChanges()
-    -- Carregar e executar o script
-    local file = io.open(scriptPath, "r")
-    if not file then
-        print("Erro ao abrir o arquivo de script!")  -- Exibe erro no print se falhar
+-- Função para obter uma descrição do valor de memória
+function getDescription(value)
+    -- Aqui você pode customizar como deseja descrever o valor.
+    -- Por exemplo, se o valor for grande (como números de 1 bilhão), você pode dizer que é um "contador de moedas" ou algo relacionado.
+    
+    if value >= 1000000000 then
+        return "Possivelmente um grande contador (ex: moedas)"
+    elseif value >= 1000000 then
+        return "Possivelmente um contador médio"
+    elseif value == 1 then
+        return "Valor binário (ligado ou verdadeiro)"
+    else
+        return "Valor genérico"
+    end
+end
+
+-- Função para capturar todos os valores e endereços do aplicativo
+function captureValuesAndAddresses(packageName)
+    -- Selecione o aplicativo com o nome do pacote
+    local appInfo = gg.getTargetInfo()
+    if appInfo.packageName ~= packageName then
+        gg.alert("Pacote não corresponde ao selecionado.")
+        return
+    end
+    
+    -- Pegando todos os endereços e valores da memória
+    local results = gg.getResults(100)  -- Você pode ajustar esse número de resultados conforme necessário
+    if not results or #results == 0 then
+        gg.alert("Nenhum valor encontrado.")
         return
     end
 
-    local content = file:read("*all")
-    file:close()
+    -- Processando os valores encontrados
+    print("Capturando endereços e valores...")
+    for _, v in ipairs(results) do
+        -- Obter a descrição do valor
+        local description = getDescription(v.value)
 
-    -- Executa a script carregada no GameGuardian
-    load(content)()
+        -- Formatar e salvar as informações no arquivo de log
+        local data = string.format("Endereço: 0x%X, Valor: %d, Descrição: %s", v.address, v.value, description)
+        saveCapturedData(data)
 
-    -- Iniciar o monitoramento das alterações nos endereços e valores
-    monitorMemoryChanges()
-end
-
--- Função para monitorar alterações na memória enquanto a script é executada
-function monitorMemoryChanges()
-    -- Definindo um valor inicial para monitorar
-    local previousResults = {}
-    
-    -- Exemplo de monitoramento contínuo das alterações
-    print("Monitorando as alterações de valores e endereços na memória...")
-
-    while true do
-        -- Captura até 100 resultados da memória (endereços e valores)
-        local results = gg.getResults(100)
-        
-        if results and #results > 0 then
-            for i, v in ipairs(results) do
-                -- Verifica se o endereço e valor já foram capturados antes
-                local found = false
-                for _, prev in ipairs(previousResults) do
-                    if prev.address == v.address then
-                        found = true
-                        -- Se o valor foi alterado, salva a alteração
-                        if prev.value ~= v.value then
-                            local data = string.format("Endereço: 0x%X, Valor Alterado: %s -> %s", v.address, prev.value, v.value)
-                            saveCapturedData(data)
-                            print(data)  -- Exibe a alteração no console
-                        end
-                        break
-                    end
-                end
-
-                -- Se o endereço não foi encontrado, adiciona ele ao histórico
-                if not found then
-                    table.insert(previousResults, {address = v.address, value = v.value})
-                end
-            end
-        end
-
-        gg.sleep(1000)  -- Aguarda 1 segundo antes de verificar novamente
+        -- Exibir o que foi salvo no console para confirmação
+        print(data)
     end
 end
 
--- Inicia o processo de execução e monitoramento
-print("Iniciando a execução do script e monitoramento de alterações...")
-executeScriptAndMonitorChanges()
+-- Função principal para iniciar a captura
+function startCapture()
+    -- Escolher o pacote do aplicativo
+    local packageName = gg.prompt({"Digite o nome do pacote do aplicativo"}, {""}, {"text"})[1]
+    
+    -- Se o nome do pacote for vazio, interromper
+    if not packageName or packageName == "" then
+        gg.alert("Nome do pacote não fornecido.")
+        return
+    end
+    
+    -- Iniciar captura de valores e endereços do aplicativo
+    captureValuesAndAddresses(packageName)
+end
+
+-- Iniciar o processo
+startCapture()
