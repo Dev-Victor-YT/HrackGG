@@ -49,7 +49,7 @@ function tryAllKeys()
             saveDecrypted("[Código Descriptografado - Chave " .. key .. "]:\n" .. decryptedContent)
             gg.toast("Chave correta encontrada: " .. key)
             gg.toast("Prosseguindo com a descriptografia no arquivo.")
-            return
+            return  -- Encerra o loop após encontrar a chave correta
         end
 
         -- Atualiza a porcentagem de progresso a cada iteração
@@ -61,7 +61,7 @@ function tryAllKeys()
     end
 
     -- Caso não encontre nenhuma chave válida
-    gg.toast("Nenhuma chave válida encontrada.")
+    gg.toast("Erro: Nenhuma chave válida encontrada. Tentativas terminadas.")
 end
 
 -- Função para verificar se o conteúdo descriptografado é válido
