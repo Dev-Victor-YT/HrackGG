@@ -5,7 +5,7 @@ local logPath = "/storage/emulated/0/Download/DecryptScript.txt"
 function saveDecrypted(text)
     local file = io.open(logPath, "w")  -- Sobrescreve para manter o último script
     if not file then
-        gg.alert("Erro ao salvar o script descriptografado!")
+        gg.toast("Erro ao salvar o script descriptografado!")  -- Usar toast para erro
         return
     end
     file:write(text .. "\n")
@@ -25,15 +25,15 @@ end
 function tryAllKeys()
     local file = io.open(scriptPath, "r")
     if not file then
-        gg.alert("Erro ao abrir o arquivo de script!")
+        gg.toast("Erro ao abrir o arquivo de script!")
         return
     end
 
     local content = file:read("*all")
     file:close()
 
-    -- Inicia o diálogo informando que o processo começou
-    gg.alert("Iniciando tentativas de descriptografar, aguarde...")
+    -- Inicia o diálogo informando que o processo começou (sem pausar o script)
+    gg.toast("Iniciando tentativas de descriptografar, aguarde...")
 
     -- Testa todas as chaves de 0 até 99999999 e mostra progresso
     local totalKeys = 100000000  -- Total de chaves que vamos testar
@@ -45,7 +45,7 @@ function tryAllKeys()
             -- Quando a chave correta for encontrada, salva o script e exibe um aviso
             saveDecrypted("[Código Descriptografado - Chave " .. key .. "]:\n" .. decryptedContent)
             gg.toast("Chave correta encontrada: " .. key)
-            gg.alert("Chave correta encontrada!\nProsseguindo com a descriptografia no arquivo.")
+            gg.toast("Prosseguindo com a descriptografia no arquivo.")
             return
         end
 
@@ -55,7 +55,7 @@ function tryAllKeys()
     end
 
     -- Caso não encontre nenhuma chave válida
-    gg.alert("Nenhuma chave válida encontrada.")
+    gg.toast("Nenhuma chave válida encontrada.")
 end
 
 -- Função para verificar se o conteúdo descriptografado é válido
@@ -68,5 +68,5 @@ function isValidScript(content)
 end
 
 -- Inicia a tentativa de descriptografar com todas as chaves
-gg.alert("Iniciando a tentativa de descriptografar o script...\nAguarde...")
+gg.toast("Iniciando a tentativa de descriptografar o script... Aguarde...")
 tryAllKeys()
