@@ -1,4 +1,6 @@
--- Caminho pré-definido do arquivo de script local scriptPath = "/storage/emulated/0/Download/DecryptScript.lua"  -- Modifique para o caminho correto do seu script local logPath = "/storage/emulated/0/DecryptScript.txr"
+-- Caminho pré-definido do arquivo de script
+local scriptPath = "/storage/emulated/0/Download/DecryptScript.lua"  -- Modifique para o caminho correto do seu script
+local logPath = "/storage/emulated/0/DecryptScript.txr"
 
 -- Função para executar a script function executeScript() local file = io.open(scriptPath, "r") if not file then gg.alert("Erro ao abrir o arquivo de script!") return end
 
