@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulador de Bombas</title>
+  <style>
+    body { font-family: sans-serif; background: #f0f0f0; text-align: center; padding: 20px; }
+    textarea { width: 90%; height: 140px; margin: 10px 0; }
+    button { padding: 10px 20px; font-size: 16px; margin-top: 10px; }
+    #attempts { font-weight: bold; margin-top: 10px; }
+    pre {
+      text-align: left;
+      background: white;
+      padding: 10px;
+      width: 90%;
+      margin: 20px auto;
+      border-radius: 5px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+  <h1>Simulador de Bombas (até um quadrado atingir 100 visualizações)</h1>
+
+  <h3>JSON de marcação (ex: "true" = bomba marcada):</h3>
+  <textarea id="inputJson">{
+  "1": "false", "2": "false", "3": "true", "4": "false", "5": "false",
+  "6": "false", "7": "true", "8": "false", "9": "false", "10": "false",
+  "11": "false", "12": "false", "13": "false", "14": "false", "15": "false",
+  "16": "false", "17": "false", "18": "false", "19": "false", "20": "false",
+  "21": "false", "22": "false", "23": "false", "24": "false", "25": "false"
+}</textarea>
+  <br>
+  <button onclick="startSimulation()">Iniciar Simulação</button>
+
+  <div id="attempts">Tentativas: 0</div>
+
+  <h3>Resultado Atual (JSON com total de bombas por quadrado):</h3>
+  <pre id="gridResult">{}</pre>
+
+  <script>
+    function startSimulation() {
+      const inputText = document.getElementById("inputJson").value;
+      const gridResult = document.getElementById("gridResult");
+      const attemptsEl = document.getElementById("attempts");
+
+      let markings;
+      try {
+        markings = JSON.parse(inputText);
+      } catch {
+        alert("JSON inválido");
+        return;
+      }
+
+      const keys = Object.keys(markings);
+      const size = keys.length;
+      const bombCount = Object.values(markings).filter(v => v === "true").length;
+
+      const bombHits = {};
+      keys.forEach(key => bombHits[key] = 0);
+
+      let attempts = 0;
+
+      const interval = setInterval(() => {
+        attempts++;
+        attemptsEl.textContent = `Tentativas: ${attempts}`;
+
+        // Gera bombas aleatórias
+        const indices = [...Array(size).keys()];
+        shuffle(indices);
+        const selected = indices.slice(0, bombCount);
+
+        // Conta onde caiu bomba
+        selected.forEach(index => {
+          const key = keys[index];
+          bombHits[key]++;
+        });
+
+        // Atualiza visualização
+        gridResult.textContent = JSON.stringify(bombHits, null, 2);
+
+        // Verifica se algum quadrado chegou a 100 bombas
+        const reached100 = Object.values(bombHits).some(count => count >= 100);
+        if (reached100) {
+          clearInterval(interval);
+          attemptsEl.textContent += " (finalizado - um quadrado atingiu 100 bombas)";
+        }
+      }, 20);
+    }
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+  </script>
+</body>
+</html>
